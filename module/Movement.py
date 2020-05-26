@@ -27,6 +27,19 @@ def rotate(angle):
         #time.sleep(0.01)
         if(current >= angle): break
 
+def rotate2(angle):
+    speed = math.pi/4
+    if angle < 0 : speed *= -1
+    mov_cmd.angular.z = speed
+    angle = abs(angle)
+    current = 0
+    t0 = rospy.Time.now().to_sec()
+    while True:
+        cmd_vel.publish(mov_cmd)
+        t1 = rospy.Time.now().to_sec()
+        if(t1 - t0 >= 1) : break
+
+
 def move(distance):
     speed = 0.2
     mov_cmd.linear.x = speed

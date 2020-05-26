@@ -1,18 +1,25 @@
 import threading
 import serial
 import time
+import Logics
 
-class RFSensor(threading.Thread,): #RF 센서의 값을 받기 위해서만 존재.
+
+
+class RFSensor(threading.Thread): #RF 센서의 값을 받기 위해서만 존재.
     i = 0
     tagID = ['D92E'.encode(), '5DAB'.encode(), 'C88C'.encode()] # default Tag IDs (Base on JIMBO)
     tagCount = len(tagID)
     anchorID = '8B0D'.encode()
     ACM = [None] * tagCount
     ACM_ID = [None] * tagCount
+    LocationQueue = []
+    RAdistList = []
+    RBdistList = []
+    RCdistList = []
 
-    def __init__(self):
+    def __init__(self, queue):
         threading.Thread.__init__(self)
-
+        self.LocationQueue = queue
     def setTagID(self, RA, RB, RC): # if want to change RFSensors ID
         self.tagID[0] = RA.encode()
         self.tagID[1] = RB.encode()
@@ -24,7 +31,7 @@ class RFSensor(threading.Thread,): #RF 센서의 값을 받기 위해서만 존�
     def swap(self, ser, name):
         ser_tmp = ser[:]
         for i in range(len(name)):
-            a = self.TagID.index(name[i])
+            a = self.tagID.index(name[i])
             ser[a] = ser_tmp[i]
         return ser
 
@@ -50,7 +57,9 @@ class RFSensor(threading.Thread,): #RF 센서의 값을 받기 위해서만 존�
         for i in range(self.tagCount):
             for i in range(self.tagCount):
                 self.ACM_ID[i] = self.ACM[i].readline()
+                print(self.ACM_ID[i])
                 self.ACM_ID[i] = self.ACM_ID[i][53:57]  # pretty print "id"
+
         ACM = self.swap(self.ACM, self.ACM_ID)  # Set Tag in appropriate Location
         print('Complete TAG Init Serial Ports.')
 
@@ -64,7 +73,7 @@ class RFSensor(threading.Thread,): #RF 센서의 값을 받기 위해서만 존�
 
 
 
-    def run(self, RAdistList,RBdistList,RCdistList): # 원본에서 Push와 Filtering부분을 제외함.
+    def run(self):
         self.initTags()
 
         tagData = [None] * self.tagCount
@@ -92,6 +101,24 @@ class RFSensor(threading.Thread,): #RF 센서의 값을 받기 위해서만 존�
 
             # get rf distance
             if FLAG_DISTANCE == 1:
-                RAdistList.append(r_distance[0])
-                RBdistList.append(r_distance[1])
-                RCdistList.append(r_distance[2])
+                self.RAdistList.append(r_distance[0] * 100)
+                self.RBdistList.append(r_distance[1] * 100)
+                self.RCdistList.append(r_distance[2] * 100)
+
+            if(len(self.RAdistList) >= 7):
+                A = Logics.filter(self.RAdistList)
+                B = Logics.filter(self.RBdistList)
+                C = Logics.filter(self.RCdistList)
+                print("A : " , end=" ")
+                print(A, end=" ")
+                print("B : ", end=" ")
+                print(B, end=" ")
+                print("C : ", end=" ")
+                print(C)
+                X,Y = Logics.calcCoordinate(A,B,C)
+                coord = [X,Y]
+                self.LocationQueue += [coord]
+                self.RAdistList = []
+                self.RBdistList = []
+                self.RCdistList = []
+
