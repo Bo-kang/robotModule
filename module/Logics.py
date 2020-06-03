@@ -1,14 +1,11 @@
 import numpy as np
 import math
-
+import sys
 distance = 32
 frontAngle = math.atan(1)
 
 def filter(array):
-    arrSize = len(array)
     array.sort()
-    print('arrsize : ', end=' ')
-    print(arrSize)
     return np.mean(array[1:-2])
 
 def calcCoordinate(avgTag1, avgTag2, avgTag3):
@@ -19,17 +16,11 @@ def calcCoordinate(avgTag1, avgTag2, avgTag3):
 def getDistance(X,Y):
     return math.sqrt(X**2 + Y**2)
 
-def getAngle(X, Y):
-    dist = math.sqrt(X**2 + Y**2)
-    curAngle = math.asin(Y/dist)
-    return curAngle
-    # resultAngle = 0
-    # if(X < 0 and Y < 0):
-    #     curAngle = curAngle * -1
-    #     resultAngle = math.pi
-    # elif(X < 0):
-    #     resultAngle = math.pi*0.5
-    # rotateAngle = frontAngle - curAngle ## 회전 방향을 고려하여 부호를 변경해야할 필요가 있음!!
-    # resultAngle += rotateAngle
-    #
-    # return resultAngle
+def getAngle(x, y):
+    if y > 0:
+        return math.atan(x / y) * 180 / math.pi  # degree
+    else:
+        if x > 0:
+            return 180 + math.atan(x / (y + sys.float_info.epsilon)) * 180 / math.pi  # degree
+        else:
+            return - 180 + math.atan(x / (y + sys.float_info.epsilon)) * 180 / math.pi  # degree

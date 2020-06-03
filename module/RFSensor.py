@@ -101,19 +101,17 @@ class RFSensor(threading.Thread): #RF 센서의 값을 받기 위해서만 존�
 
             # get rf distance
             if FLAG_DISTANCE == 1:
-                self.RAdistList.append(r_distance[0] * 100)
-                self.RBdistList.append(r_distance[1] * 100)
-                self.RCdistList.append(r_distance[2] * 100)
+                self.RAdistList.append(r_distance[0])
+                self.RBdistList.append(r_distance[1])
+                self.RCdistList.append(r_distance[2])
 
             if(len(self.RAdistList) >= 7):
-                A = Logics.filter(self.RAdistList)
-                B = Logics.filter(self.RBdistList)
-                C = Logics.filter(self.RCdistList)
-                print("A : " , end=" ")
-                print(A, end=" ")
-                print("B : ", end=" ")
-                print(B, end=" ")
-                print("C : ", end=" ")
+
+                A = round(Logics.filter(self.RAdistList)*100)
+                B = round(Logics.filter(self.RBdistList)*100)
+                C = round(Logics.filter(self.RCdistList)*100)
+                print(A)
+                print(B)
                 print(C)
                 X,Y = Logics.calcCoordinate(A,B,C)
                 coord = [X,Y]

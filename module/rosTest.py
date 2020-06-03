@@ -1,6 +1,8 @@
 import threading
 import time
-arr1 = []
-arr2 = [1,2]
-arr1 += [arr2]
-print(arr1)
+import Movement
+import Logics
+import math
+angle = Logics.getAngle(3,1)
+print(round(angle * (180/math.pi) ))
+#Movement.move(0.3);
