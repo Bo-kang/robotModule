@@ -12,34 +12,6 @@ cmd_vel = rospy.Publisher('cmd_vel_mux/input/navi', Twist,
 rospy.on_shutdown(shutdown)
 move_cmd = Twist()
 
-def rotate(angle):
-    speed = math.pi/4
-    if angle < 0 : speed *= -1
-    move_cmd.angular.z = speed
-    angle = abs(angle)
-    current = 0
-    targetTime = angle/speed
-    t0 = rospy.Time.now().to_sec()
-    while True:
-        cmd_vel.publish(move_cmd)
-        t1 = rospy.Time.now().to_sec()
-        print(1)
-        time.sleep(0.5)
-        if(t1-t0 >= targetTime): break
-
-
-
-def rotate2(angle):
-    speed = math.pi/4
-    if angle < 0 : speed *= -1
-    move_cmd.angular.z = speed
-    angle = abs(angle)
-    current = 0
-    t0 = rospy.Time.now().to_sec()
-    while True:
-        cmd_vel.publish(move_cmd)
-        t1 = rospy.Time.now().to_sec()
-        if(t1 - t0 >= 1) : break
 
 
 def move():
@@ -47,6 +19,10 @@ def move():
     move_cmd.linear.x = speed
     cmd_vel.publish(move_cmd)
     time.sleep(0.5)
+
+def stop():
+    move_cmd.linear.x = 0
+    cmd_vel.publish(move_cmd)
 
 def rotate3(angle):
     relative_angle = abs(angle * math.pi / 180)
