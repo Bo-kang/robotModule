@@ -20,38 +20,9 @@ while True:
         before = now
         targetX = queue[now-1][0]
         targetY = queue[now-1][1]
-        angle = Logics.getAngle(targetX, targetY)
-        print('angle', end = ' : ')
-        print(angle)
+        print(targetX)
+        print(targetY)
 
-    if targetX != 0 and targetY != 0:
-        angle = Logics.getAngle(targetX, targetY)
-
-        print('angle', end = ' : ')
-        print(angle)
-
-        distance = Logics.getDistance(targetX,targetY)
-        Movement.rotate3(angle)
-        distance -= 150
-        time = distance/20
-        targetCount = time/0.5
-
-        print('targetCount', end=' : ')
-        print(targetCount)
-
-        print('distance', end = ' : ')
-        print(distance)
-
-        count = 0
-        while not detect:
-            Movement.move()
-            if(targetCount <= count):
-                break
-            count += 1
-            print('count', end=' : ')
-            print(count)
-
-        if not detect : break
 
 
 

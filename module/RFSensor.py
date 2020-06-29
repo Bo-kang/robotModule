@@ -107,11 +107,11 @@ class RFSensor(threading.Thread): #RF 센서의 값을 받기 위해서만 존�
 
             if(len(self.RAdistList) >= 7):
 
-                A = round(Logics.filter(self.RAdistList)*100)
-                B = round(Logics.filter(self.RBdistList)*100)
-                C = round(Logics.filter(self.RCdistList)*100)
-                print(A)
-                print(B)
+                A = (Logics.filter(self.RAdistList))
+                B = (Logics.filter(self.RBdistList))
+                C = (Logics.filter(self.RCdistList))
+                print(A, end = '  ')
+                print(B, end='  ')
                 print(C)
                 X,Y = Logics.calcCoordinate(A,B,C)
                 coord = [X,Y]

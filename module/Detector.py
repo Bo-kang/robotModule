@@ -136,6 +136,7 @@ def detecting():
         floor_removed_bw = cv2.medianBlur(test_Bi, 5)  # Kunel Size 5
 
         if (floor_removed_bw == 255).any():
+
             # gray = cv2.cvtColor(floor_removed, cv2.COLOR_RGB2GRAY)  # TODO:
             # threshold = cv2.threshold(gray, 1, 255, 0)[1]
 
@@ -148,8 +149,7 @@ def detecting():
             medium_points = np.empty(shape=[0, 3])  # (x, y, r)
             for cnt in contours:
                 x, y, w, h = cv2.boundingRect(cnt)  # find obstacle in camera view point
-                if (
-                        80 < h or 120 < w) and 10 < w and 10 < h:  # here!!!!!!!!!!!!!!!!!!!!!!!! h < 200 is to ignore the wall
+                if (80 < h or 120 < w) and 10 < w and 10 < h:  # here!!!!!!!!!!!!!!!!!!!!!!!! h < 200 is to ignore the wall
 
                     cv2.drawContours(floor_removed, [cnt], 0, (0, 255, 0), 2)
 
@@ -165,6 +165,7 @@ def detecting():
                     # convert camera view point obstacle (x, y) to bird view (x, y) coordinate
                     points = np.empty(shape=[0, 2])
                     for i in range(w // 10):
+
                         for j in range(h // 20):
                             points = np.empty(shape=[0, 2])  # (x, y)
                             # obstacle (x,y) in the same z of depth camera
@@ -175,25 +176,26 @@ def detecting():
                                 point[0] -= 0.1
                                 point[1] += 0.1
 
-                                if (abs(point[0] > 0.5)) and (abs(point[1] ) > 0.5):  # 50cm far from XY_COORD_M
-                                    points = np.append(points, [point], 0)
+                                #if (abs(point[0] > 0.5)) and (abs(point[1] ) > 0.5):  # 50cm far from XY_COORD_M
+                                points = np.append(points, [point], 0)
 
                     cv2.putText(floor_removed, str(points.shape), (cx, cy + 20), cv2.FONT_HERSHEY_SCRIPT_SIMPLEX, 1,(255, 255, 0), 2)
 
                     # calculate medium points
                     if points.any():
+
                         if (abs(points[:, 0]) < ROI_X).any():  # ROI_X : 0.4
                             cv2.putText(floor_removed,
                                         str(round(calculate_distance(np.mean(points, 0), [0, 0]), 2)) + 'm',
                                         (cx, cy - 20), cv2.FONT_HERSHEY_SCRIPT_SIMPLEX, 1, (255, 255, 0), 2)
 
                             if np.mean(points, 0)[0] > 0:
-                                print("obs in right")
+                                #print("obs in right")
                                 medium_point = np.min(points, 0)
                                 # medium_point[0] -= 0.65 # offset
                                 # medium_point[1] = 0.5
                             else:
-                                print("obs in left")
+                                #print("obs in left")
                                 medium_point = np.max(points, 0)
                                 # medium_point[0] += 0.65 # offset
                                 # medium_point[1] = 0.5
@@ -203,8 +205,13 @@ def detecting():
                             medium_point = np.append(medium_point, calculate_distance([0, 0], medium_point))  # append r : distacne from (0, 0) to obstacle
                             medium_points = np.append(medium_points, [medium_point], 0)
                 if medium_points.any():
+                    print('detect')
                     detect = True
                     medium_goal = medium_points[np.argmin(medium_points[:, 2])][:2]  # (x, y) about minimum of r
+                else:
+                    detect = False
+
+
 
 
 

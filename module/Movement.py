@@ -32,7 +32,9 @@ def rotate3(angle):
     angular_acceleration = 0.005
 
     while current_angle < relative_angle :                                              # angular vel == 0.6 or -0.6 setting (- : CW, + : CCW)
-
+        if move_cmd.linear.x - 0.001 <= 0:
+            move_cmd.linear.x = 0
+        move_cmd.linear.x -= 0.001
         t0 = rospy.Time.now().to_sec()
         if abs(move_cmd.angular.z) < 0.6:  # maximum angle velocity
             if angle > 0:

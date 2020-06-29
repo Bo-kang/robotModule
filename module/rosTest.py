@@ -4,6 +4,7 @@ import Movement
 import Logics
 import math
 import Detector
+import RFSensor
 
 def loggingData(speed, time, count):
     distance = speed * time * count
@@ -17,17 +18,18 @@ def avoid():
     global t
     distance = 0
     target = Detector.medium_goal
-    angle = Logics.getAngle(target[0],target[1])
+    angle = Logics.getAngle(target[0],target[1]) * -2
+    dist = Logics.getDistance(target[0],target[1])
+    print(angle)
     Movement.rotate3(angle)
     count = 0
-    while True:
+    for i in range(4):
         Movement.move()
-        if(count >= 5):
-            distance = speed*t*count
-            break
     return distance, angle
 
-
+queue = []
+rf = RFSensor.RFSensor(queue)
+rf.start()
 
 de = threading.Thread(target = Detector.detecting)
 de.start()
@@ -41,8 +43,11 @@ count = 0
 speed = 0.2
 t = 0.5
 gradient = 1
-targetX = (int)(input("input X value : "))
-targetY = (int)(input("input Y value : "))
+while(len(queue) == 0):
+    print('waiting')
+
+targetX = queue[len(queue)-1][0]
+targetY = queue[len(queue)-1][1]
 
 
 
@@ -50,15 +55,24 @@ if(targetY == 0): targetY = 0.1
 
 log.append([logTopX, logTopY])
 angle = Logics.getAngle(targetX, targetY)
-Movement.rotate3(angle)
+Movement.rotate3(angle-45)
 
-
+count = 0
 
 while True:
-    if(logTopX + 1 >= targetX and logTopX -1 <= targetX and logTopY + 1 >= targetY and logTopY -1 <= targetY):
-        break
+    print(targetX, end = '   ')
+    print(targetY)
+    count+=1
+    if(Logics.getDistance(targetX, targetY) <= 2 ):
+        print('done')
+        while True:
+            targetX = queue[len(queue) - 1][0]
+            targetY = queue[len(queue) - 1][1]
+            if (Logics.getDistance(targetX, targetY) > 2 ): break
 
     if Detector.detect:
+
+        Movement.stop()
         print('123123')
         tempX, tempY = loggingData(speed, t, count)
         logTopX += tempX
@@ -66,30 +80,23 @@ while True:
 
         log.append([logTopX, logTopY])
 
-        moveDistance, angle = avoid()
+        avoid()
 
-        afterX = math.cos(angle) * moveDistance
-        afterY = math.sin(angle) * moveDistance
-
-        tempX = logTopX - afterX
-        tempY = logTopY - afterY
-        if tempY == 0: tempY = 0.1
-        gradient = tempX / tempY
-
-        angle = Logics.getAngle(tempX, tempY)
-        Movement.rotate(angle)
-
-        log.append([logTopX, logTopY])
+        targetX = queue[len(queue) - 1][0]
+        targetY = queue[len(queue) - 1][1]
+        angle = Logics.getAngle(targetX, targetY)
+        Movement.rotate3(angle - 45)
 
     else:
-        Movement.move()
-        count += 1
-        if(count >= 3):
-            tempX, tempY = loggingData(speed, t, count)
+        if(count>=5):
+            before = len(queue)
+            targetX = queue[len(queue) - 1][0]
+            targetY = queue[len(queue) - 1][1]
+            angle = Logics.getAngle(targetX, targetY)
+            Movement.rotate3(angle - 45)
             count = 0
-            logTopX += tempX
-            logTopY += tempY
-            log.append([logTopX,logTopY])
-            print(logTopX, end = ' ')
-            print(logTopY)
-            print(Detector.detect)
+        Movement.move()
+        tempX, tempY = loggingData(speed, t, 1)
+        logTopX += tempX
+        logTopY += tempY
+        log.append([logTopX,logTopY])

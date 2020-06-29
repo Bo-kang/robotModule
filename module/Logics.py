@@ -1,7 +1,7 @@
 import numpy as np
 import math
 import sys
-distance = 32
+distance = 0.32
 frontAngle = math.atan(1)
 
 def filter(array):
